@@ -2,13 +2,13 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<head>
+
     @section scripts
 {
-        <script type="text\javascript" src="~/js/emailsender.js" asp-append-version="true"></script>
+        <script type="text\javascript" src="@Url.Content("~/js/emailsender.js")" asp-append-version="true"></script>
     }
 
-</head>
+
 <span class='checkbox_text' id='response_text' style='display : none'> Your subscriptions were changed </span>
 <hr id='response_text_hr' style='display : none'>
 

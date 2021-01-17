@@ -1,3 +1,4 @@
+using EmailSender.Areas;
 using EmailSender.Data;
 using EmailSender.Models;
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +22,7 @@ namespace EmailSender
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            EmailScheduler.Start();
         }
 
         public IConfiguration Configuration { get; }
