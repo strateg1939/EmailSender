@@ -1,0 +1,36 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    @section scripts
+{
+        <script type="text\javascript" src="~/js/emailsender.js" asp-append-version="true"></script>
+    }
+
+</head>
+<span class='checkbox_text' id='response_text' style='display : none'> Your subscriptions were changed </span>
+<hr id='response_text_hr' style='display : none'>
+
+<span class='checkbox_text' id='another_text_sub'> Here are topics you can subscribe to and get daily articles about :</span>
+<br>
+<br>
+<div id='subscription_for_user'>
+    @foreach (var item in ViewData["topicsToAdd"] as Dictionary<int, string>)
+    {
+
+        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id='@item.Value+.text'> @item.Value </span></p>
+    }
+</div>
+<hr id="hr" />
+<span class='checkbox_text' id='another_text_unsub'>And here you can unsubscribe from topics if you no longer want to receive emails:</span>
+<br>
+<br>
+<div id='unsubscription_for_user'>
+    @foreach (var item in ViewData["topicsToRemove"] as Dictionary<int, string>)
+    {
+
+        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id='@item.Value+.text'> @item.Value </span></p>
+    }
+</div>
+<input type="submit" name="submit" value="submit" id="subs_submit">

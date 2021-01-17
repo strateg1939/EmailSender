@@ -1,0 +1,98 @@
+﻿
+    /*for subsription form */
+    @import url('https://fonts.googleapis.com/css2?family=BioRhyme:wght@300&display=swap');
+    #subs_submit{
+    text-decoration: none;
+    outline: none;
+    display: inline-block;
+    width: 140px;
+    height: 45px;
+    line-height: 15px;
+    border-radius: 45px;
+    margin: 10px 10px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 15px;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 3px;
+    font-weight: 600;
+    color: #524f4e;
+    background: white;
+    box-shadow: 0 8px 15px rgba(0,0,0,.1);
+    transition: .3s;
+}
+
+#subs_submit:hover {
+    background: #e5b42e;
+    box-shadow: 0 15px 20px rgba(229, 180, 46,.4);
+    color: white;
+    transform: translateY(-7px);
+}
+
+.checkbox_text {
+    position: relative;
+    display: inline;
+    left: 40px;
+    font-family: BioRhyme;
+    font-size: 22px;
+    font-style: normal;
+}
+
+#another_text_sub {
+    top: 10px;
+    left: 25px;
+}
+
+#another_text_unsub {
+    left: 25px;
+}
+
+#response_text {
+    text-align: center;
+    top: 20px;
+    left: 30%;
+    font-weight: 600;
+}
+
+.option-input {
+    position: relative;
+    top: 0px;
+    right: 0;
+    bottom: 20px;
+    left: 30px;
+    -ms-transform: scale(2); /* IE */
+    -moz-transform: scale(2); /* FF */
+    -webkit-transform: scale(2); /* Safari and Chrome */
+    -o-transform: scale(2); /* Opera */
+    transform: scale(2);
+    transition: all 0.15s ease-out 0s;
+    background: #cbd1d8;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    outline: none;
+    z-index: 1000;
+}
+
+    .option-input:hover {
+        background: #9faab7;
+    }
+
+    .option-input:checked {
+        background: #40e0d0;
+    }
+
+        
+
+        .option-input:checked::after {
+            -webkit-animation: click-wave 0.65s;
+            -moz-animation: click-wave 0.65s;
+            animation: click-wave 0.65s;
+            background: #40e0d0;
+            content: "";
+            display: block;
+            position: relative;
+            z-index: 100;
+        }
+
