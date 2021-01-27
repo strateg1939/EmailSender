@@ -29,11 +29,7 @@ namespace EmailSender.Controllers
         {
             return View();
         }
-        [Authorize]
-        public IActionResult EmailSender()
-        {
-            return View();
-        }
+        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
