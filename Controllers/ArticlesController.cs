@@ -47,6 +47,8 @@ namespace EmailSender.Controllers
         // GET: Articles/Create
         public IActionResult Create()
         {
+            var topic = from a in _context.Topics select a.TopicId;
+            ViewBag.Topic = topic.ToList();
             return View();
         }
 
@@ -69,6 +71,7 @@ namespace EmailSender.Controllers
         // GET: Articles/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            
             if (id == null)
             {
                 return NotFound();
@@ -79,6 +82,8 @@ namespace EmailSender.Controllers
             {
                 return NotFound();
             }
+            var topic = from a in _context.Topics select a.TopicId;
+            ViewBag.Topic = topic.ToList();
             return View(article);
         }
 
