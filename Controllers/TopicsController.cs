@@ -29,7 +29,7 @@ namespace EmailSender.Controllers
         private static SmtpClient InitializeSmtp()
         {
            
-            const string fromPassword = "I11072003van";
+            const string fromPassword = "************";
             return new SmtpClient
             {
                 Host = "smtp.gmail.com",
