@@ -70,7 +70,7 @@ namespace EmailSender.Controllers
                 connection_user_topic newLine = new connection_user_topic();
                 newLine.TopicID = item;
                 newLine.AspNetUserID = currentUserID;
-                sendEmail(currentUserID, currentUserMail, item);
+                _emailService.sendEmail(currentUserID, currentUserMail, item);
                 _context.connection_user_topic.Add(newLine);
             }
             if (sendMail[sendMailList[1]].Any())
@@ -82,45 +82,7 @@ namespace EmailSender.Controllers
                 }
             }
              _context.SaveChanges();
-            return "success";
-            
-        }
-
-        public void sendEmail(string userId, string userMail, int topicId)
-        {
-
-            string topic = _context.Topics.First(i => i.TopicId == topicId).Topic_name;
-
-            var toAddress = new MailAddress(userMail, "To Name");
-
-            string subject = "Your daily " + topic + " article";
-
-            var possibleArticles = _context.Articles.Where(c => c.TopicID == topicId && c.date.Date == DateTime.Today);
-
-            foreach (var possibleArticle in possibleArticles)
-            {
-                _context.Entry(possibleArticle).Collection(p => p.connection_User_Articles).Load();
-                if (possibleArticle.connection_User_Articles == null || !possibleArticle.connection_User_Articles.Any(c => c.AspNetUserId == userId && c.ArticleId == possibleArticle.ArticleId))
-                {
-                    string body = possibleArticle.Article_text;
-                    var addLink = new connection_user_article { ArticleId = possibleArticle.ArticleId, AspNetUserId = userId };
-                    _context.Add(addLink);
-                    using (var message = new MailMessage(_emailService.fromAddress, toAddress)
-                    {
-                        Subject = subject,
-                        Body = body
-                    })
-                    {
-                        _emailService.smtpClient.Send(message);
-                    }
-
-                }
-            }
-            _context.SaveChanges();
-
-
-
-
+            return "success";   
         }
     }
 }
