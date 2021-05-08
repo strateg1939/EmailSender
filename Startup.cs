@@ -70,9 +70,9 @@ namespace EmailSender
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-             //   endpoints.MapControllerRoute(
-           //         name: "")
-
+                //   endpoints.MapControllerRoute(
+                //         name: "")
+                endpoints.MapRazorPages();
             });
         }
     }
