@@ -62,11 +62,8 @@ namespace EmailSender.Models
 
                 entity.Property(e => e.UserName).HasColumnType("nvarchar(256)");
             });
-
-            OnModelCreatingPartial(modelBuilder);
         }
 
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     
     
 

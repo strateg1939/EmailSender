@@ -32,13 +32,12 @@ namespace EmailSender
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite("Data Source=DataToSendMail.db"));
+               options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddDbContext<TopicsContext>(options =>
-                options.UseSqlite("Data Source=DataToSendMail.db"));
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddControllersWithViews();
             services.AddSingleton<EmailService>();
         }
@@ -73,7 +72,7 @@ namespace EmailSender
                     pattern: "{controller=Home}/{action=Index}/{id?}");
              //   endpoints.MapControllerRoute(
            //         name: "")
-                endpoints.MapRazorPages();
+
             });
         }
     }
