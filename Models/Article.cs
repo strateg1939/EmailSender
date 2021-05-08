@@ -14,7 +14,7 @@ namespace EmailSender.Models
         public DateTime date { get; set; }
         [Column(TypeName ="TEXT")]
         public string Article_text { get; set; }
-        public Topic Topic;
+        public Topic Topic { get; set; }
         public ICollection<connection_user_article> connection_User_Articles { get; set; }
 
     }

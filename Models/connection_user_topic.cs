@@ -9,7 +9,7 @@ namespace EmailSender.Models
     {
         public string AspNetUserID { get; set; }
         public int TopicID { get; set; }
-        public Topic Topic;
-        public AspNetUser AspNetUser;
+        public Topic Topic { get; set; }
+        public AspNetUser AspNetUser { get; set; }
     }
 }

@@ -34,7 +34,7 @@ namespace EmailSender.Controllers
                 return NotFound();
             }
 
-            var article = await _context.Articles
+            var article = await _context.Articles.Include(m => m.Topic)
                 .FirstOrDefaultAsync(m => m.ArticleId == id);
             if (article == null)
             {
@@ -47,7 +47,7 @@ namespace EmailSender.Controllers
         // GET: Articles/Create
         public IActionResult Create()
         {
-            ViewBag.Topic = _context.Topics.ToList();
+            ViewBag.Topic = new SelectList(_context.Topics.ToList(), "TopicId", "Topic_name");
             return View();
         }
 
@@ -81,8 +81,7 @@ namespace EmailSender.Controllers
             {
                 return NotFound();
             }
-            var topic = from a in _context.Topics select a.TopicId;
-            ViewBag.Topic = topic.ToList();
+            ViewBag.Topic = new SelectList(_context.Topics.ToList(), "TopicId", "Topic_name");
             return View(article);
         }
 
