@@ -14,8 +14,9 @@ namespace EmailSender.Services
         private const string fromPassword = "I11072003van";
         public readonly MailAddress fromAddress = new MailAddress("newdomain.subscription@gmail.com", "From Name");
         public readonly SmtpClient smtpClient;
-        public EmailService()
+        public EmailService(TopicsContext context)
         {
+            _context = context;
             smtpClient = new SmtpClient
             {
                 Host = "smtp.gmail.com",
