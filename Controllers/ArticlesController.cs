@@ -47,8 +47,7 @@ namespace EmailSender.Controllers
         // GET: Articles/Create
         public IActionResult Create()
         {
-            var topic = from a in _context.Topics select a.TopicId;
-            ViewBag.Topic = topic.ToList();
+            ViewBag.Topic = _context.Topics.ToList();
             return View();
         }
 
