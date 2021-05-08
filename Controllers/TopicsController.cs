@@ -12,38 +12,22 @@ using Microsoft.AspNetCore.Identity;
 
 using System.Net;
 using System.Net.Mail;
+using EmailSender.Services;
 
 namespace EmailSender.Controllers
 {
     public class TopicsController : Controller
     {
+        private EmailService _emailService;
+        private TopicsContext _context;
+        private string currentUserID;
+        private string currentUserMail;
+       
 
-        private readonly TopicsContext _context;
-        string currentUserID;
-        string currentUserMail;
-        private static MailAddress fromAddress = new MailAddress("newdomain.subscription@gmail.com", "From Name");
-
-
-        private SmtpClient smtp = InitializeSmtp();
-
-        private static SmtpClient InitializeSmtp()
-        {
-           
-            const string fromPassword = "I11072003van";
-            return new SmtpClient
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
-            };
-        }
-
-        public TopicsController(TopicsContext context)
+        public TopicsController(TopicsContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
        
            
@@ -52,8 +36,6 @@ namespace EmailSender.Controllers
         [Authorize]
         public IActionResult Index()
         {
-
-            
             ClaimsPrincipal currentUser = this.User;
             currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
             var topicsToRemove = from p in _context.Topics join c in _context.connection_user_topic on p.TopicId equals c.TopicID where c.AspNetUserID == currentUserID select new { p.Topic_name, c.TopicID };
@@ -123,13 +105,13 @@ namespace EmailSender.Controllers
                     string body = possibleArticle.Article_text;
                     var addLink = new connection_user_article { ArticleId = possibleArticle.ArticleId, AspNetUserId = userId };
                     _context.Add(addLink);
-                    using (var message = new MailMessage(fromAddress, toAddress)
+                    using (var message = new MailMessage(_emailService.fromAddress, toAddress)
                     {
                         Subject = subject,
                         Body = body
                     })
                     {
-                        smtp.Send(message);
+                        _emailService.smtpClient.Send(message);
                     }
 
                 }

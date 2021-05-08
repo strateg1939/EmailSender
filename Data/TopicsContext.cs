@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EmailSender.Models
 {
-    public partial class TopicsContext : DbContext
+    public class TopicsContext : DbContext
     {
         public TopicsContext(DbContextOptions
     <TopicsContext> options) : base(options)
