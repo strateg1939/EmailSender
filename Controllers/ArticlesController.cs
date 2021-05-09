@@ -23,7 +23,7 @@ namespace EmailSender.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Articles.ToListAsync());
+            return View(await _context.Articles.Include(article => article.Topic).ToListAsync());
         }
 
         // GET: Articles/Details/5

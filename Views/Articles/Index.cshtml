@@ -18,7 +18,12 @@
             <th>
                 Text of an article
             </th>
-            <th></th>
+            <th>
+                Topic
+            </th>
+            <th>
+                Action
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -29,6 +34,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Article_text)
+            </td>
+            <td>
+                @item.Topic.Topic_name
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ArticleId">Edit</a> |
