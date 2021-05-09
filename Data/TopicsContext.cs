@@ -23,6 +23,10 @@ namespace EmailSender.Models
 
             modelBuilder.Entity<connection_user_article>().HasKey(i => new { i.ArticleId, i.AspNetUserId });
             modelBuilder.Entity<connection_user_topic>().HasKey(i => new { i.TopicID, i.AspNetUserID });
+            modelBuilder.Entity<connection_user_article>()
+            .HasOne(p => p.Article)
+            .WithMany(b => b.connection_User_Articles)
+            .HasForeignKey(p => p.ArticleId);
 
 
             modelBuilder.Entity<AspNetUser>(entity =>

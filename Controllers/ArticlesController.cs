@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EmailSender.Models;
 using Microsoft.AspNetCore.Authorization;
+using EmailSender.Services;
 
 namespace EmailSender.Controllers
 {
     public class ArticlesController : Controller
     {
         private readonly TopicsContext _context;
+        private readonly EmailService _emailService;
 
-        public ArticlesController(TopicsContext context)
+        public ArticlesController(TopicsContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // GET: Articles
@@ -62,6 +65,14 @@ namespace EmailSender.Controllers
             {
                 _context.Add(article);
                 await _context.SaveChangesAsync();
+                if (article.date.Date == DateTime.Today)
+                {
+                    var usersToSend = _context.connection_user_topic.Where(con => con.TopicID == article.TopicID).Include(con => con.AspNetUser).Select(con => new { con.AspNetUserID, con.AspNetUser.Email});
+                    string subject = "New article about " + _context.Topics.FirstOrDefault(topic => topic.TopicId == article.TopicID).Topic_name;
+                    foreach (var user in usersToSend) {
+                        _emailService.SendEmail(article, user.AspNetUserID, user.Email, subject);
+                    }
+                }                
                 return RedirectToAction(nameof(Index));
             }
             return View(article);

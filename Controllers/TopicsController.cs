@@ -70,7 +70,7 @@ namespace EmailSender.Controllers
                 connection_user_topic newLine = new connection_user_topic();
                 newLine.TopicID = item;
                 newLine.AspNetUserID = currentUserID;
-                _emailService.sendEmail(currentUserID, currentUserMail, item);
+                _emailService.GetAllEmailsToSend(currentUserID, currentUserMail, item);
                 _context.connection_user_topic.Add(newLine);
             }
             if (sendMail[sendMailList[1]].Any())
