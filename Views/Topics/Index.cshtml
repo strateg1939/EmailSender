@@ -3,9 +3,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-  
-
-
 <span class='checkbox_text' id='response_text' style='display : none'> Your subscriptions were changed </span>
 <hr id='response_text_hr' style='display : none'>
 
@@ -15,8 +12,8 @@
 <div id='subscription_for_user'>
     @foreach (var item in ViewData["topicsToAdd"] as Dictionary<int, string>)
     {
-
-        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id='@item.Value+.text'> @item.Value </span></p>
+        var itemText = item.Value + "text"; 
+        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id=@itemText> @item.Value </span></p>
     }
 </div>
 <hr id="hr" />
@@ -26,8 +23,8 @@
 <div id='unsubscription_for_user'>
     @foreach (var item in ViewData["topicsToRemove"] as Dictionary<int, string>)
     {
-
-        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id='@item.Value+.text'> @item.Value </span></p>
+        var itemText = item.Value + "text";
+        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id=@itemText> @item.Value </span></p>
     }
 </div>
 <input type="submit" name="submit" value="submit" id="subs_submit">
