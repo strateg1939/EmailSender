@@ -70,7 +70,7 @@ namespace EmailSender.Controllers
                     var usersToSend = _context.connection_user_topic.Where(con => con.TopicID == article.TopicID).Include(con => con.AspNetUser).Select(con => new { con.AspNetUserID, con.AspNetUser.Email});
                     string subject = "New article about " + _context.Topics.FirstOrDefault(topic => topic.TopicId == article.TopicID).Topic_name;
                     foreach (var user in usersToSend) {
-                        _emailService.SendEmail(article, user.AspNetUserID, user.Email, subject);
+                        await _emailService.SendEmail(article, user.AspNetUserID, user.Email, subject);
                     }
                 }                
                 return RedirectToAction(nameof(Index));

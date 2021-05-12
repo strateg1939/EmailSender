@@ -27,7 +27,7 @@ namespace EmailSender.Services
                 Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
             };
         }
-        public void GetAllEmailsToSend(string userId, string userMail, int topicId)
+        public async Task GetAllEmailsToSend(string userId, string userMail, int topicId)
         {
             string topic = _context.Topics.First(i => i.TopicId == topicId).Topic_name;            
             string subject = "Your daily " + topic + " article";
@@ -37,12 +37,12 @@ namespace EmailSender.Services
                 _context.Entry(possibleArticle).Collection(p => p.connection_User_Articles).Load();
                 if (possibleArticle.connection_User_Articles == null || !possibleArticle.connection_User_Articles.Any(c => c.AspNetUserId == userId && c.ArticleId == possibleArticle.ArticleId))
                 {
-                    SendEmail(possibleArticle, userId, userMail, subject);
+                    await SendEmail(possibleArticle, userId, userMail, subject);
                 }
             }
             
         }
-        public void SendEmail(Article article, string userId, string userMail, string subject)
+        public async Task SendEmail(Article article, string userId, string userMail, string subject)
         {
             var toAddress = new MailAddress(userMail, "To Name");
             string body = article.Article_text;
@@ -56,7 +56,7 @@ namespace EmailSender.Services
             {
                 smtpClient.Send(message);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
