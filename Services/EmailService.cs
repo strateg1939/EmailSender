@@ -17,7 +17,7 @@ namespace EmailSender.Services
             _dbContext = context;
             _senderService = senderService;
         }
-        public async Task GetAllEmailsToSend(string userId, string userMail, int topicId)
+        public async Task SendNecessaryArticlesToUser(string userId, string userMail, int topicId)
         {
             string topic = _dbContext.Topics.First(i => i.TopicId == topicId).Topic_name;            
             string subject = "Your daily " + topic + " article";
@@ -29,8 +29,7 @@ namespace EmailSender.Services
                 {
                     await SendArticleEmail(possibleArticle, userId, userMail, subject);
                 }
-            }
-            
+            }            
         }
         public async Task SendArticleEmail(Article article, string userId, string userMail, string subject)
         {           

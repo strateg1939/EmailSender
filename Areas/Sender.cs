@@ -31,7 +31,7 @@ namespace EmailSender.Areas
                 string userId = item.Id;
                 string userMail = item.Email;
                 int topic = item.TopicId;
-                _emailService.GetAllEmailsToSend(userId, userMail, topic);
+                await _emailService.SendNecessaryArticlesToUser(userId, userMail, topic);
 
             }
         }

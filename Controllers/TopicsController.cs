@@ -29,36 +29,39 @@ namespace EmailSender.Controllers
             _context = context;
             _emailService = emailService;
         }
-       
-           
-    
 
         [Authorize]
         public IActionResult Index()
         {
             ClaimsPrincipal currentUser = this.User;
             currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var topicsToRemove = from p in _context.Topics join c in _context.connection_user_topic on p.TopicId equals c.TopicID where c.AspNetUserID == currentUserID select new { p.Topic_name, c.TopicID };
-            var topicsToAdd = from p in _context.Topics where !(from c in _context.connection_user_topic where c.AspNetUserID == currentUserID select c.TopicID).Contains(p.TopicId) select new { p.TopicId, p.Topic_name };
-            Dictionary<int, string> removeTopics = new Dictionary<int, string>();
-            Dictionary<int, string> addTopics = new Dictionary<int, string>();
-            foreach (var topicToRemove in topicsToRemove)
-            {
-                removeTopics.Add(topicToRemove.TopicID, topicToRemove.Topic_name);
-            }
-            ViewData["topicsToRemove"] = removeTopics; 
-
-            foreach(var topicToAdd in topicsToAdd)
-            {
-                addTopics.Add(topicToAdd.TopicId, topicToAdd.Topic_name);
-            }
-            ViewData["topicsToAdd"] = addTopics;
+            Dictionary<int, string> topicsThatCanUnsubscribed = new Dictionary<int, string>();
+            Dictionary<int, string> topicsThatCanSubscribed = new Dictionary<int, string>();
+            FindTopicsForUser(currentUserID, topicsThatCanUnsubscribed, topicsThatCanSubscribed);
+           
+            ViewData["topicsToRemove"] = topicsThatCanUnsubscribed; 
+            ViewData["topicsToAdd"] = topicsThatCanSubscribed;
             return View();
+        }
+
+        private void FindTopicsForUser(string currentUserID, Dictionary<int, string> topicsThatCanUnsubscribed, Dictionary<int, string> topicsThatCanSubscribed)
+        {
+            var subscribedTopics = from p in _context.Topics join c in _context.connection_user_topic on p.TopicId equals c.TopicID where c.AspNetUserID == currentUserID select new { p.Topic_name, c.TopicID };
+            var notSubscribedTopics = from p in _context.Topics where !(from c in _context.connection_user_topic where c.AspNetUserID == currentUserID select c.TopicID).Contains(p.TopicId) select new { p.TopicId, p.Topic_name };
+
+            foreach (var subscribedTopic in subscribedTopics)
+            {
+                topicsThatCanUnsubscribed.Add(subscribedTopic.TopicID, subscribedTopic.Topic_name);
+            }
+            foreach (var notSubscribedTopic in notSubscribedTopics)
+            {
+                topicsThatCanSubscribed.Add(notSubscribedTopic.TopicId, notSubscribedTopic.Topic_name);
+            }
         }
 
         [HttpPost]
         [Route("api/[controller]")]
-        public string PostController([FromBody] Dictionary<string, List<int>> sendMail)
+        public async Task<string> PostControllerAsync([FromBody] Dictionary<string, List<int>> sendMail)
         {
             ClaimsPrincipal currentUser = this.User;
             currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -70,7 +73,7 @@ namespace EmailSender.Controllers
                 connection_user_topic newLine = new connection_user_topic();
                 newLine.TopicID = item;
                 newLine.AspNetUserID = currentUserID;
-                _emailService.GetAllEmailsToSend(currentUserID, currentUserMail, item);
+                await _emailService.SendNecessaryArticlesToUser(currentUserID, currentUserMail, item);
                 _context.connection_user_topic.Add(newLine);
             }
             if (sendMail[sendMailList[1]].Any())
