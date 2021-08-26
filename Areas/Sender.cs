@@ -24,7 +24,8 @@ namespace EmailSender.Areas
 
         public async Task Execute(IJobExecutionContext executionContext)
         {
-            var usersAndTopics = _context.AspNetUsers.Join(_context.connection_user_topic, u => u.Id, c => c.AspNetUserID, (u, c) => new { Id = u.Id, Email = u.Email, TopicId = c.TopicID }
+            var usersAndTopics = _context.AspNetUsers.Join(
+                _context.connection_user_topic, u => u.Id, c => c.AspNetUserID, (u, c) => new { Id = u.Id, Email = u.Email, TopicId = c.TopicID }
             );
             foreach (var item in usersAndTopics)
             {
@@ -32,7 +33,6 @@ namespace EmailSender.Areas
                 string userMail = item.Email;
                 int topic = item.TopicId;
                 await _emailService.SendNecessaryArticlesToUser(userId, userMail, topic);
-
             }
         }
     }
