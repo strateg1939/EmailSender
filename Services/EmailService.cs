@@ -27,17 +27,17 @@ namespace EmailSender.Services
                 _dbContext.Entry(possibleArticle).Collection(p => p.connection_User_Articles).Load();
                 if (possibleArticle.connection_User_Articles == null || !possibleArticle.connection_User_Articles.Any(c => c.AspNetUserId == user.Id && c.ArticleId == possibleArticle.ArticleId))
                 {
-                    await SendArticleEmail(possibleArticle, user.Id, user.Email, subject);
+                    await SendArticleEmail(possibleArticle, user, subject);
                 }
             }            
         }
-        public async Task SendArticleEmail(Article article, string userId, string userMail, string subject)
+        public async Task SendArticleEmail(Article article, AspNetUser user, string subject)
         {           
             string body = article.Article_text;
-            var addLink = new connection_user_article { ArticleId = article.ArticleId, AspNetUserId = userId };
+            var addLink = new connection_user_article { ArticleId = article.ArticleId, AspNetUserId = user.Id };
             _dbContext.connection_user_article.Add(addLink);
             await _dbContext.SaveChangesAsync();
-            await _senderService.SendMessage(userMail, subject, body);
+            await _senderService.SendMessage(user.Email, subject, body);
         }
     }
 }

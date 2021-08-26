@@ -14,7 +14,7 @@ namespace EmailSender.Areas
             IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
             await scheduler.Start();
 
-            IJobDetail job = JobBuilder.Create<Sender>().Build();
+            IJobDetail job = JobBuilder.Create<EmailSchedulerSender>().Build();
 
             ITrigger trigger = TriggerBuilder.Create()  
                 .WithIdentity("trigger1", "group1")     

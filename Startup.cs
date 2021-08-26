@@ -23,7 +23,6 @@ namespace EmailSender
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-//            EmailScheduler.Start();
         }
 
         public IConfiguration Configuration { get; }

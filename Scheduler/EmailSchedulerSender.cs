@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace EmailSender.Areas
 {
-    public class Sender : IJob
+    public class EmailSchedulerSender : IJob
     {
         private readonly EmailService _emailService;
         private ApplicationDbContext _context;
-        public Sender(ApplicationDbContext context, EmailService emailService)
+        public EmailSchedulerSender(ApplicationDbContext context, EmailService emailService)
         {
             _emailService = emailService;
             _context = context;
@@ -25,14 +25,13 @@ namespace EmailSender.Areas
         public async Task Execute(IJobExecutionContext executionContext)
         {
             var usersAndTopics = _context.AspNetUsers.Join(
-                _context.connection_user_topic, u => u.Id, c => c.AspNetUserID, (u, c) => new { Id = u.Id, Email = u.Email, TopicId = c.TopicID }
+                _context.connection_user_topic, user => user.Id, connection => connection.AspNetUserID, (user, connection) => new { Id = user.Id, Email = user.Email, TopicId = connection.TopicID }
             );
             foreach (var item in usersAndTopics)
             {
-                string userId = item.Id;
-                string userMail = item.Email;
+                var user = new AspNetUser { Id = item.Id, Email = item.Email };
                 int topic = item.TopicId;
-//                await _emailService.SendNecessaryArticlesToUser(userId, userMail, topic);
+                await _emailService.SendNecessaryArticlesToUser(user, topic);
             }
         }
     }
