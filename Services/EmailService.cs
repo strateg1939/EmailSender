@@ -10,53 +10,35 @@ namespace EmailSender.Services
 {
     public class EmailService
     {
-        ApplicationDbContext _context;
-        private const string fromPassword = "I11072003van";
-        public readonly MailAddress fromAddress = new MailAddress("newdomain.subscription@gmail.com", "From Name");
-        public readonly SmtpClient smtpClient;
-        public EmailService(ApplicationDbContext context)
+        private readonly ApplicationDbContext _dbContext;
+        public readonly EmailSenderService _senderService;
+        public EmailService(ApplicationDbContext context, EmailSenderService senderService)
         {
-            _context = context;
-            smtpClient = new SmtpClient
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
-            };
+            _dbContext = context;
+            _senderService = senderService;
         }
         public async Task GetAllEmailsToSend(string userId, string userMail, int topicId)
         {
-            string topic = _context.Topics.First(i => i.TopicId == topicId).Topic_name;            
+            string topic = _dbContext.Topics.First(i => i.TopicId == topicId).Topic_name;            
             string subject = "Your daily " + topic + " article";
-            var possibleArticles = _context.Articles.Where(c => c.TopicID == topicId && c.date.Date == DateTime.Today);
+            var possibleArticles = _dbContext.Articles.Where(c => c.TopicID == topicId && c.date.Date == DateTime.Today);
             foreach (var possibleArticle in possibleArticles)
             {
-                _context.Entry(possibleArticle).Collection(p => p.connection_User_Articles).Load();
+                _dbContext.Entry(possibleArticle).Collection(p => p.connection_User_Articles).Load();
                 if (possibleArticle.connection_User_Articles == null || !possibleArticle.connection_User_Articles.Any(c => c.AspNetUserId == userId && c.ArticleId == possibleArticle.ArticleId))
                 {
-                    await SendEmail(possibleArticle, userId, userMail, subject);
+                    await SendArticleEmail(possibleArticle, userId, userMail, subject);
                 }
             }
             
         }
-        public async Task SendEmail(Article article, string userId, string userMail, string subject)
-        {
-            var toAddress = new MailAddress(userMail, "To Name");
+        public async Task SendArticleEmail(Article article, string userId, string userMail, string subject)
+        {           
             string body = article.Article_text;
             var addLink = new connection_user_article { ArticleId = article.ArticleId, AspNetUserId = userId };
-            _context.connection_user_article.Add(addLink);
-            using (var message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = subject,
-                Body = body
-            })
-            {
-                smtpClient.Send(message);
-            }
-            await _context.SaveChangesAsync();
+            _dbContext.connection_user_article.Add(addLink);
+            await _dbContext.SaveChangesAsync();
+            await _senderService.SendMessage(userMail, subject, body);
         }
     }
 }

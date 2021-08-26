@@ -1,6 +1,7 @@
 using EmailSender.Areas;
 using EmailSender.Models;
 using EmailSender.Services;
+using EmailSender.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -37,6 +38,8 @@ namespace EmailSender
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddControllersWithViews();
             services.AddScoped<EmailService>();
+            services.Configure<EmailSettings>(Configuration.GetSection("MailSettings"));
+            services.AddSingleton<EmailSenderService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
