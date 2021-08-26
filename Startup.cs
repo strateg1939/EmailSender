@@ -1,5 +1,4 @@
 using EmailSender.Areas;
-using EmailSender.Data;
 using EmailSender.Models;
 using EmailSender.Services;
 using Microsoft.AspNetCore.Builder;
@@ -32,8 +31,6 @@ namespace EmailSender
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-               options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDbContext<TopicsContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();

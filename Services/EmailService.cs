@@ -10,11 +10,11 @@ namespace EmailSender.Services
 {
     public class EmailService
     {
-        TopicsContext _context;
+        ApplicationDbContext _context;
         private const string fromPassword = "I11072003van";
         public readonly MailAddress fromAddress = new MailAddress("newdomain.subscription@gmail.com", "From Name");
         public readonly SmtpClient smtpClient;
-        public EmailService(TopicsContext context)
+        public EmailService(ApplicationDbContext context)
         {
             _context = context;
             smtpClient = new SmtpClient

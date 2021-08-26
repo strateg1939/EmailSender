@@ -15,8 +15,8 @@ namespace EmailSender.Areas
     public class Sender : IJob
     {
         private readonly EmailService _emailService;
-        private TopicsContext _context;
-        public Sender(TopicsContext context, EmailService emailService)
+        private ApplicationDbContext _context;
+        public Sender(ApplicationDbContext context, EmailService emailService)
         {
             _emailService = emailService;
             _context = context;

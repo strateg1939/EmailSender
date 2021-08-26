@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace EmailSender.Models
 {
-    public class TopicsContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
-        public TopicsContext(DbContextOptions
-    <TopicsContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions
+    <ApplicationDbContext> options) : base(options)
         {
         }
         public DbSet<Topic> Topics { get; set; }

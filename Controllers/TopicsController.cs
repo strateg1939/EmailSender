@@ -19,12 +19,12 @@ namespace EmailSender.Controllers
     public class TopicsController : Controller
     {
         private EmailService _emailService;
-        private TopicsContext _context;
+        private ApplicationDbContext _context;
         private string currentUserID;
         private string currentUserMail;
        
 
-        public TopicsController(TopicsContext context, EmailService emailService)
+        public TopicsController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
             _emailService = emailService;

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EmailSender.Migrations
 {
-    [DbContext(typeof(TopicsContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20210114170202_addedArticles")]
     partial class addedArticles
     {

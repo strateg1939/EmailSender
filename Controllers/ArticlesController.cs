@@ -13,10 +13,10 @@ namespace EmailSender.Controllers
 {
     public class ArticlesController : Controller
     {
-        private readonly TopicsContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly EmailService _emailService;
 
-        public ArticlesController(TopicsContext context, EmailService emailService)
+        public ArticlesController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
             _emailService = emailService;
