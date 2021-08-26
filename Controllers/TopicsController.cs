@@ -18,23 +18,23 @@ namespace EmailSender.Controllers
 {
     public class TopicsController : Controller
     {
-        private EmailService _emailService;
-        private ApplicationDbContext _context;
-        private string currentUserID;
-        private string currentUserMail;
+        private readonly EmailService _emailService;
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<AspNetUser> _userManager;
        
 
-        public TopicsController(ApplicationDbContext context, EmailService emailService)
+        public TopicsController(ApplicationDbContext context, EmailService emailService, UserManager<AspNetUser> userManager)
         {
             _context = context;
             _emailService = emailService;
+            _userManager = userManager;
         }
 
         [Authorize]
         public IActionResult Index()
         {
             ClaimsPrincipal currentUser = this.User;
-            currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
             Dictionary<int, string> topicsThatCanUnsubscribed = new Dictionary<int, string>();
             Dictionary<int, string> topicsThatCanSubscribed = new Dictionary<int, string>();
             FindTopicsForUser(currentUserID, topicsThatCanUnsubscribed, topicsThatCanSubscribed);
@@ -46,8 +46,12 @@ namespace EmailSender.Controllers
 
         private void FindTopicsForUser(string currentUserID, Dictionary<int, string> topicsThatCanUnsubscribed, Dictionary<int, string> topicsThatCanSubscribed)
         {
-            var subscribedTopics = from p in _context.Topics join c in _context.connection_user_topic on p.TopicId equals c.TopicID where c.AspNetUserID == currentUserID select new { p.Topic_name, c.TopicID };
-            var notSubscribedTopics = from p in _context.Topics where !(from c in _context.connection_user_topic where c.AspNetUserID == currentUserID select c.TopicID).Contains(p.TopicId) select new { p.TopicId, p.Topic_name };
+            var subscribedTopics = _context.connection_user_topic
+                .Where(connection => connection.AspNetUserID == currentUserID)
+                .Include(connection => connection.Topic)
+                .Select(connection => new { connection.Topic.Topic_name, connection.TopicID });
+            var notSubscribedTopics = from topic in _context.Topics where 
+                !(from c in _context.connection_user_topic where c.AspNetUserID == currentUserID select c.TopicID).Contains(topic.TopicId) select new { topic.TopicId, topic.Topic_name };
 
             foreach (var subscribedTopic in subscribedTopics)
             {
@@ -64,23 +68,21 @@ namespace EmailSender.Controllers
         public async Task<string> PostControllerAsync([FromBody] Dictionary<string, List<int>> sendMail)
         {
             ClaimsPrincipal currentUser = this.User;
-            currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            currentUserMail = currentUser.FindFirst(ClaimTypes.Email).Value;
+            var user = await _userManager.GetUserAsync(currentUser);
             List<string> sendMailList = new List<string>(sendMail.Keys);
             foreach(var item in sendMail[sendMailList[0]])
             {
                 connection_user_topic newLine = new connection_user_topic();
                 newLine.TopicID = item;
-                newLine.AspNetUserID = currentUserID;
-                await _emailService.SendNecessaryArticlesToUser(currentUserID, currentUserMail, item);
+                newLine.AspNetUserID = user.Id;
+                await _emailService.SendNecessaryArticlesToUser(user, item);
                 _context.connection_user_topic.Add(newLine);
             }
             if (sendMail[sendMailList[1]].Any())
             {
                 foreach (var item in sendMail[sendMailList[1]])
                 {
-                    var deleteTopic = _context.connection_user_topic.Where(c => c.AspNetUserID == currentUserID && c.TopicID == item).First();
+                    var deleteTopic = _context.connection_user_topic.Where(c => c.AspNetUserID == user.Id && c.TopicID == item).First();
                     _context.connection_user_topic.Remove(deleteTopic);
                 }
             }

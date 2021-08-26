@@ -17,7 +17,7 @@ namespace EmailSender.Services
             _dbContext = context;
             _senderService = senderService;
         }
-        public async Task SendNecessaryArticlesToUser(string userId, string userMail, int topicId)
+        public async Task SendNecessaryArticlesToUser(AspNetUser user, int topicId)
         {
             string topic = _dbContext.Topics.First(i => i.TopicId == topicId).Topic_name;            
             string subject = "Your daily " + topic + " article";
@@ -25,9 +25,9 @@ namespace EmailSender.Services
             foreach (var possibleArticle in possibleArticles)
             {
                 _dbContext.Entry(possibleArticle).Collection(p => p.connection_User_Articles).Load();
-                if (possibleArticle.connection_User_Articles == null || !possibleArticle.connection_User_Articles.Any(c => c.AspNetUserId == userId && c.ArticleId == possibleArticle.ArticleId))
+                if (possibleArticle.connection_User_Articles == null || !possibleArticle.connection_User_Articles.Any(c => c.AspNetUserId == user.Id && c.ArticleId == possibleArticle.ArticleId))
                 {
-                    await SendArticleEmail(possibleArticle, userId, userMail, subject);
+                    await SendArticleEmail(possibleArticle, user.Id, user.Email, subject);
                 }
             }            
         }

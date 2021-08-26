@@ -32,7 +32,7 @@ namespace EmailSender.Areas
                 string userId = item.Id;
                 string userMail = item.Email;
                 int topic = item.TopicId;
-                await _emailService.SendNecessaryArticlesToUser(userId, userMail, topic);
+//                await _emailService.SendNecessaryArticlesToUser(userId, userMail, topic);
             }
         }
     }
