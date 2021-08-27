@@ -79,26 +79,29 @@ function subs_send_data() {
     ourRequest.send(JSON.stringify(send_data_actual));
 
 }
-var subs_submit = $("#subs_submit");
 
-if (subs_submit) {
-    subs_submit.on("click", subs_send_data);
+var url = new URL(window.location.href);
+if (url.pathname.endsWith("Topics")) {
+    var subs_submit = $("#subs_submit");
+    if (subs_submit) {
+        subs_submit.on("click", subs_send_data);
+    }
+    $('document').ready(
+        function () {
+            if ($("#subscription_for_user .option-input").length === 0) {
+                $("#another_text_sub").css("display", "none");
+                $("#hr").css("display", "none");
+            }
+            if ($("#unsubscription_for_user .option-input").length === 0) {
+                $("#another_text_unsub").css("display", "none");
+                $("#hr").css("display", "none");
+            }
+            if ($("#hr").css("display", "none") && $("#subscription_for_user .option-input").length > 0 && $("#unsubscription_for_user .option-input").length > 0) {
+                $("#hr").css("display", "block");
+            }
+        }
+    )
 }
 
-$('document').ready(
-    function () {
-        if ($("#subscription_for_user .option-input").length === 0) {
-            $("#another_text_sub").css("display", "none");
-            $("#hr").css("display", "none");
-        }
-        if ($("#unsubscription_for_user .option-input").length === 0) {
-            $("#another_text_unsub").css("display", "none");
-            $("#hr").css("display", "none");
-        }
-        if ($("#hr").css("display", "none") && $("#subscription_for_user .option-input").length > 0 && $("#unsubscription_for_user .option-input").length > 0) {
-            $("#hr").css("display", "block");
-        }
-    }
-)
 
 
