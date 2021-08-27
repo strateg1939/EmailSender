@@ -15,6 +15,9 @@ namespace EmailSender.Models
         [Column(TypeName ="TEXT")]
         public string Article_text { get; set; }
         public Topic Topic { get; set; }
+        public string CreatorID { get; set; }
+        public AspNetUser AspNetUser { get; set; }
+        
         public ICollection<connection_user_article> connection_User_Articles { get; set; }
 
     }

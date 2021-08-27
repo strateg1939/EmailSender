@@ -24,6 +24,11 @@ namespace EmailSender.Models
         public DbSet<AspNetUser> AspNetUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Article>()
+                .HasOne(a => a.AspNetUser)
+                .WithMany(user => user.Articles)
+                .HasForeignKey(a => a.CreatorID)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<connection_user_article>().HasKey(i => new { i.ArticleId, i.AspNetUserId });
             modelBuilder.Entity<connection_user_topic>().HasKey(i => new { i.TopicID, i.AspNetUserID });
             modelBuilder.Entity<connection_user_article>()

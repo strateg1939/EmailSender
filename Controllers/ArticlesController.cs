@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using EmailSender.Models;
 using Microsoft.AspNetCore.Authorization;
 using EmailSender.Services;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace EmailSender.Controllers
 {
@@ -15,18 +17,20 @@ namespace EmailSender.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ArticleEmailService _emailService;
+        private readonly UserManager<AspNetUser> _userManager;
 
-        public ArticlesController(ApplicationDbContext context, ArticleEmailService emailService)
+        public ArticlesController(ApplicationDbContext context, ArticleEmailService emailService, UserManager<AspNetUser> userManager)
         {
             _context = context;
             _emailService = emailService;
+            _userManager = userManager;
         }
 
         // GET: Articles
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Articles.Include(article => article.Topic).ToListAsync());
+            return View(await _context.Articles.Where(article => article.CreatorID == GetCurrentUser().Id).Include(article => article.Topic).ToListAsync());
         }
 
         // GET: Articles/Details/5
@@ -39,7 +43,7 @@ namespace EmailSender.Controllers
 
             var article = await _context.Articles.Include(m => m.Topic)
                 .FirstOrDefaultAsync(m => m.ArticleId == id);
-            if (article == null)
+            if (article == null || !CanUserEditArticle(article))
             {
                 return NotFound();
             }
@@ -63,6 +67,7 @@ namespace EmailSender.Controllers
         {
             if (ModelState.IsValid)
             {
+                article.AspNetUser = GetCurrentUser();
                 _context.Add(article);
                 await _context.SaveChangesAsync();
                 if (article.date.Date == DateTime.Today)
@@ -89,7 +94,7 @@ namespace EmailSender.Controllers
             }
 
             var article = await _context.Articles.FindAsync(id);
-            if (article == null)
+            if (article ==  null || !CanUserEditArticle(article))
             {
                 return NotFound();
             }
@@ -108,12 +113,20 @@ namespace EmailSender.Controllers
             {
                 return NotFound();
             }
-
+            
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(article);
+                    Article articleInDb = _context.Articles.Find(id);
+                    if (articleInDb.CreatorID != GetCurrentUser().Id)
+                    {
+                        return Forbid();
+                    }
+                    articleInDb.TopicID = article.TopicID;
+                    articleInDb.date = article.date;
+                    articleInDb.Article_text = article.Article_text;
+                    _context.Update(articleInDb);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -142,7 +155,7 @@ namespace EmailSender.Controllers
 
             var article = await _context.Articles
                 .FirstOrDefaultAsync(m => m.ArticleId == id);
-            if (article == null)
+            if (article == null || !CanUserEditArticle(article))
             {
                 return NotFound();
             }
@@ -155,15 +168,29 @@ namespace EmailSender.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            
             var article = await _context.Articles.FindAsync(id);
-            _context.Articles.Remove(article);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (CanUserEditArticle(article))
+            {
+                _context.Articles.Remove(article);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return Forbid();
         }
 
         private bool ArticleExists(int id)
         {
             return _context.Articles.Any(e => e.ArticleId == id);
+        }
+        private bool CanUserEditArticle(Article article)
+        {
+            return article.CreatorID == GetCurrentUser().Id;
+        }
+        private AspNetUser GetCurrentUser()
+        {
+            ClaimsPrincipal currentUser = this.User;
+            return _userManager.GetUserAsync(currentUser).Result;
         }
     }
 }

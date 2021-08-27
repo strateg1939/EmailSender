@@ -3,14 +3,16 @@ using System;
 using EmailSender.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EmailSender.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class TopicsContextModelSnapshot : ModelSnapshot
+    [Migration("20210827180440_Added_UserId_To_Articles")]
+    partial class Added_UserId_To_Articles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
