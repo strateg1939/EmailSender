@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace EmailSender.Services
 {
-    public class EmailSenderService
+    public class SmtpEmailSenderService : IEmailSender
     {
         private readonly EmailSettings _emailSettings;
         public readonly SmtpClient smtpClient;
-        public EmailSenderService(IOptions<EmailSettings> emailSettings)
+        public SmtpEmailSenderService(IOptions<EmailSettings> emailSettings) 
         {
             _emailSettings = emailSettings.Value;
             smtpClient = new SmtpClient

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace EmailSender.Services
 {
-    public class EmailService
+    public class ArticleEmailService
     {
         private readonly ApplicationDbContext _dbContext;
-        public readonly EmailSenderService _senderService;
-        public EmailService(ApplicationDbContext context, EmailSenderService senderService)
+        public readonly IEmailSender _senderService;
+        public ArticleEmailService(ApplicationDbContext context, IEmailSender senderService)
         {
             _dbContext = context;
             _senderService = senderService;
@@ -36,8 +36,8 @@ namespace EmailSender.Services
             string body = article.Article_text;
             var addLink = new connection_user_article { ArticleId = article.ArticleId, AspNetUserId = user.Id };
             _dbContext.connection_user_article.Add(addLink);
-            await _dbContext.SaveChangesAsync();
             await _senderService.SendMessage(user.Email, subject, body);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

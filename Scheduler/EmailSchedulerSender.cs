@@ -14,9 +14,9 @@ namespace EmailSender.Areas
 {
     public class EmailSchedulerSender : IJob
     {
-        private readonly EmailService _emailService;
+        private readonly ArticleEmailService _emailService;
         private ApplicationDbContext _context;
-        public EmailSchedulerSender(ApplicationDbContext context, EmailService emailService)
+        public EmailSchedulerSender(ApplicationDbContext context, ArticleEmailService emailService)
         {
             _emailService = emailService;
             _context = context;

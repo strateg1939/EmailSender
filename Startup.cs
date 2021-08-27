@@ -20,6 +20,7 @@ namespace EmailSender
 {
     public class Startup
     {
+        public const string CONSOLE_SENDER_ENVIRONMENT_NAME = "Console";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -66,9 +67,16 @@ namespace EmailSender
             });
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddControllersWithViews();
-            services.AddScoped<EmailService>();
+            services.AddScoped<ArticleEmailService>();
             services.Configure<EmailSettings>(Configuration.GetSection("MailSettings"));
-            services.AddSingleton<EmailSenderService>();
+            if (Environment.GetEnvironmentVariable("EmailService") == CONSOLE_SENDER_ENVIRONMENT_NAME)
+            {
+                services.AddSingleton<IEmailSender, ConsoleEmailSenderService>();
+            }
+            else
+            {
+                services.AddSingleton<IEmailSender, SmtpEmailSenderService>();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

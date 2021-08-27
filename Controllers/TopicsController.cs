@@ -18,12 +18,12 @@ namespace EmailSender.Controllers
 {
     public class TopicsController : Controller
     {
-        private readonly EmailService _emailService;
+        private readonly ArticleEmailService _emailService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AspNetUser> _userManager;
        
 
-        public TopicsController(ApplicationDbContext context, EmailService emailService, UserManager<AspNetUser> userManager)
+        public TopicsController(ApplicationDbContext context, ArticleEmailService emailService, UserManager<AspNetUser> userManager)
         {
             _context = context;
             _emailService = emailService;

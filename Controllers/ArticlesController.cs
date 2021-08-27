@@ -14,9 +14,9 @@ namespace EmailSender.Controllers
     public class ArticlesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly EmailService _emailService;
+        private readonly ArticleEmailService _emailService;
 
-        public ArticlesController(ApplicationDbContext context, EmailService emailService)
+        public ArticlesController(ApplicationDbContext context, ArticleEmailService emailService)
         {
             _context = context;
             _emailService = emailService;
