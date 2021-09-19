@@ -1,4 +1,3 @@
-using EmailSender.Areas;
 using EmailSender.Models;
 using EmailSender.Services;
 using EmailSender.Settings;
