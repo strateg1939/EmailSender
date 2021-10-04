@@ -30,7 +30,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @item.date.ToShortDateString();
+                @item.date.ToShortDateString()
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Article_text)
