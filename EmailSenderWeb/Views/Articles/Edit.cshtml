@@ -14,7 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ArticleId" />
             <div class="form-group">
-                <label asp-for="TopicID" class="control-label"></label>
+                <label class="control-label">Topic</label>
                 <select asp-for="TopicID" asp-items="ViewBag.Topic" class="form-control">
                     <option selected="selected" disabled="disabled">Choose topic</option>
                 </select>

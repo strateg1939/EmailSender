@@ -10,18 +10,19 @@ using Microsoft.AspNetCore.Authorization;
 using EmailSender.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using EmailSender.Dat;
 
 namespace EmailSender.Controllers
 {
     public class ArticlesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ArticleEmailService _emailService;
         private readonly UserManager<AspNetUser> _userManager;
 
-        public ArticlesController(ApplicationDbContext context, ArticleEmailService emailService, UserManager<AspNetUser> userManager)
+        public ArticlesController(IUnitOfWork unitOfWork, ArticleEmailService emailService, UserManager<AspNetUser> userManager)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _emailService = emailService;
             _userManager = userManager;
         }
@@ -30,7 +31,7 @@ namespace EmailSender.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Articles.Where(article => article.CreatorID == GetCurrentUser().Id).Include(article => article.Topic).ToListAsync());
+            return View(_unitOfWork.ArticleRepository.GetArticlesWithTopics(GetCurrentUser().Id));
         }
 
         // GET: Articles/Details/5
@@ -41,8 +42,7 @@ namespace EmailSender.Controllers
                 return NotFound();
             }
 
-            var article = await _context.Articles.Include(m => m.Topic)
-                .FirstOrDefaultAsync(m => m.ArticleId == id);
+            var article = _unitOfWork.ArticleRepository.GetArticleWithTopic(id.Value);
             if (article == null || !CanUserEditArticle(article))
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace EmailSender.Controllers
         // GET: Articles/Create
         public IActionResult Create()
         {
-            ViewBag.Topic = new SelectList(_context.Topics.ToList(), "TopicId", "Topic_name");
+            ViewBag.Topic = new SelectList(_unitOfWork.TopicsRepository.GetAll(), "TopicId", "Topic_name");
             return View();
         }
 
@@ -68,14 +68,14 @@ namespace EmailSender.Controllers
             if (ModelState.IsValid)
             {
                 article.AspNetUser = GetCurrentUser();
-                _context.Add(article);
-                await _context.SaveChangesAsync();
+                _unitOfWork.ArticleRepository.Add(article);
+                await _unitOfWork.SaveChangesAsync();
                 if (article.date.Date == DateTime.Today)
                 {
-                    var usersToSend = _context.connection_user_topic.Where(con => con.TopicID == article.TopicID).Include(con => con.AspNetUser).Select(con => new { con.AspNetUserID, con.AspNetUser.Email});
-                    string subject = "New article about " + _context.Topics.FirstOrDefault(topic => topic.TopicId == article.TopicID).Topic_name;
+                    var usersToSend = _unitOfWork.ArticleRepository.GetUsersToSend(article);
+                    string subject = "New article about " + _unitOfWork.TopicsRepository.Get(article.TopicID).Topic_name;
                     foreach (var user in usersToSend) {
-                        var aspNetUser = new AspNetUser { Id = user.AspNetUserID, Email = user.Email };
+                        var aspNetUser = new AspNetUser { Id = user.Id, Email = user.Email };
                         await _emailService.SendArticleEmail(article, aspNetUser, subject);
                     }
                 }                
@@ -93,12 +93,12 @@ namespace EmailSender.Controllers
                 return NotFound();
             }
 
-            var article = await _context.Articles.FindAsync(id);
+            var article = _unitOfWork.ArticleRepository.Get(id.Value);
             if (article ==  null || !CanUserEditArticle(article))
             {
                 return NotFound();
             }
-            ViewBag.Topic = new SelectList(_context.Topics.ToList(), "TopicId", "Topic_name");
+            ViewBag.Topic = new SelectList(_unitOfWork.TopicsRepository.GetAll(), "TopicId", "Topic_name");
             return View(article);
         }
 
@@ -118,7 +118,7 @@ namespace EmailSender.Controllers
             {
                 try
                 {
-                    Article articleInDb = _context.Articles.Find(id);
+                    Article articleInDb = _unitOfWork.ArticleRepository.Get(id);
                     if (articleInDb.CreatorID != GetCurrentUser().Id)
                     {
                         return Forbid();
@@ -126,8 +126,7 @@ namespace EmailSender.Controllers
                     articleInDb.TopicID = article.TopicID;
                     articleInDb.date = article.date;
                     articleInDb.Article_text = article.Article_text;
-                    _context.Update(articleInDb);
-                    await _context.SaveChangesAsync();
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -153,8 +152,7 @@ namespace EmailSender.Controllers
                 return NotFound();
             }
 
-            var article = await _context.Articles
-                .FirstOrDefaultAsync(m => m.ArticleId == id);
+            var article = _unitOfWork.ArticleRepository.Get(id.Value);
             if (article == null || !CanUserEditArticle(article))
             {
                 return NotFound();
@@ -169,11 +167,11 @@ namespace EmailSender.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             
-            var article = await _context.Articles.FindAsync(id);
+            var article = _unitOfWork.ArticleRepository.Get(id);
             if (CanUserEditArticle(article))
             {
-                _context.Articles.Remove(article);
-                await _context.SaveChangesAsync();
+                _unitOfWork.ArticleRepository.Remove(article);
+                await _unitOfWork.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return Forbid();
@@ -181,7 +179,7 @@ namespace EmailSender.Controllers
 
         private bool ArticleExists(int id)
         {
-            return _context.Articles.Any(e => e.ArticleId == id);
+            return _unitOfWork.ArticleRepository.ArtcileExists(id);
         }
         private bool CanUserEditArticle(Article article)
         {

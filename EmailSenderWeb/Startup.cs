@@ -1,3 +1,4 @@
+using EmailSender.Dat;
 using EmailSender.Models;
 using EmailSender.Services;
 using EmailSender.Settings;
@@ -68,6 +69,7 @@ namespace EmailSender
             services.AddControllersWithViews();
             services.AddScoped<ArticleEmailService>();
             services.Configure<EmailSettings>(Configuration.GetSection("MailSettings"));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             if (Environment.GetEnvironmentVariable("EmailService") == CONSOLE_SENDER_ENVIRONMENT_NAME)
             {
                 services.AddSingleton<IEmailSender, ConsoleEmailSenderService>();
