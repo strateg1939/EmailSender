@@ -14,19 +14,20 @@ using System.Net;
 using System.Net.Mail;
 using EmailSender.Services;
 using EmailSender.Dto;
+using EmailSender.Dat;
 
 namespace EmailSender.Controllers
 {
     public class TopicsController : Controller
     {
         private readonly ArticleEmailService _emailService;
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AspNetUser> _userManager;
 
 
-        public TopicsController(ApplicationDbContext context, ArticleEmailService emailService, UserManager<AspNetUser> userManager)
+        public TopicsController(IUnitOfWork unitOfWork, ArticleEmailService emailService, UserManager<AspNetUser> userManager)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _emailService = emailService;
             _userManager = userManager;
         }
@@ -36,8 +37,8 @@ namespace EmailSender.Controllers
         {
             ClaimsPrincipal currentUser = this.User;
             var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-            Dictionary<int, string> topicsThatCanUnsubscribed = new Dictionary<int, string>();
-            Dictionary<int, string> topicsThatCanSubscribed = new Dictionary<int, string>();
+            Dictionary<int, string> topicsThatCanUnsubscribed = new();
+            Dictionary<int, string> topicsThatCanSubscribed = new();
             FindTopicsForUser(currentUserID, topicsThatCanUnsubscribed, topicsThatCanSubscribed);
 
             ViewData["topicsToRemove"] = topicsThatCanUnsubscribed;
@@ -47,18 +48,12 @@ namespace EmailSender.Controllers
 
         private void FindTopicsForUser(string currentUserID, Dictionary<int, string> topicsThatCanUnsubscribed, Dictionary<int, string> topicsThatCanSubscribed)
         {
-            var subscribedTopics = _context.connection_user_topic
-                .Where(connection => connection.AspNetUserID == currentUserID)
-                .Include(connection => connection.Topic)
-                .Select(connection => new { connection.Topic.Topic_name, connection.TopicID });
-            var notSubscribedTopics = from topic in _context.Topics
-                                      where
-!(from c in _context.connection_user_topic where c.AspNetUserID == currentUserID select c.TopicID).Contains(topic.TopicId)
-                                      select new { topic.TopicId, topic.Topic_name };
+            var subscribedTopics = _unitOfWork.TopicsRepository.GetSubscribedTopics(currentUserID);
+            var notSubscribedTopics = _unitOfWork.TopicsRepository.GetUnsubscribedTopics(currentUserID);
 
             foreach (var subscribedTopic in subscribedTopics)
             {
-                topicsThatCanUnsubscribed.Add(subscribedTopic.TopicID, subscribedTopic.Topic_name);
+                topicsThatCanUnsubscribed.Add(subscribedTopic.TopicId, subscribedTopic.Topic_name);
             }
             foreach (var notSubscribedTopic in notSubscribedTopics)
             {
@@ -74,18 +69,15 @@ namespace EmailSender.Controllers
             var user = await _userManager.GetUserAsync(currentUser);
             foreach (var topicId in topicsPostDto.To_Subscribe)
             {
-                connection_user_topic newLine = new connection_user_topic();
+                connection_user_topic newLine = new();
                 newLine.TopicID = topicId;
                 newLine.AspNetUserID = user.Id;
                 await _emailService.SendNecessaryArticlesToUser(user, topicId);
-                _context.connection_user_topic.Add(newLine);
+                _unitOfWork.TopicsRepository.AddConnection(newLine);
             }
-            foreach (var topicId in topicsPostDto.To_Unsubscribe)
-            {
-                var deleteTopic = _context.connection_user_topic.Where(c => c.AspNetUserID == user.Id && c.TopicID == topicId).First();
-                _context.connection_user_topic.Remove(deleteTopic);
-            }
-            _context.SaveChanges();
+            var toUnsubscribe = topicsPostDto.To_Unsubscribe.Select(id => new connection_user_topic { AspNetUserID = user.Id, TopicID = id });
+            _unitOfWork.TopicsRepository.RemoveConnections(toUnsubscribe);
+            await _unitOfWork.SaveChangesAsync();
             return "success";
         }
     }
