@@ -12,5 +12,7 @@ namespace EmailSender.Dat
         Article GetArticleWithTopic(int articleId);
         IEnumerable<AspNetUser> GetUsersToSend(Article article);
         bool ArtcileExists(int id);
+        void AddConnection(connection_user_article connection);
+        bool IsEmailNeededToBeSent(string userId, Article article);
     }
 }

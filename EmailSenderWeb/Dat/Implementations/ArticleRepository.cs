@@ -33,6 +33,18 @@ namespace EmailSender.Dat
         {
             return DbContext.Articles.Any(e => e.ArticleId == id);
         }
+
+        public void AddConnection(connection_user_article connection)
+        {
+            DbContext.connection_user_article.Add(connection);
+        }
+
+        public bool IsEmailNeededToBeSent(string userId, Article article)
+        {
+            DbContext.Entry(article).Collection(p => p.connection_User_Articles).Load();
+            return article.connection_User_Articles == null || !article.connection_User_Articles.Any(c => c.AspNetUserId == userId && c.ArticleId == article.ArticleId);
+        }
+
         public ApplicationDbContext DbContext { get => _dbContext as ApplicationDbContext; }
     }
 }
