@@ -37,28 +37,10 @@ namespace EmailSender.Controllers
         {
             ClaimsPrincipal currentUser = this.User;
             var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-            Dictionary<int, string> topicsThatCanUnsubscribed = new();
-            Dictionary<int, string> topicsThatCanSubscribed = new();
-            FindTopicsForUser(currentUserID, topicsThatCanUnsubscribed, topicsThatCanSubscribed);
-
-            ViewData["topicsToRemove"] = topicsThatCanUnsubscribed;
-            ViewData["topicsToAdd"] = topicsThatCanSubscribed;
-            return View();
-        }
-
-        private void FindTopicsForUser(string currentUserID, Dictionary<int, string> topicsThatCanUnsubscribed, Dictionary<int, string> topicsThatCanSubscribed)
-        {
-            var subscribedTopics = _unitOfWork.TopicsRepository.GetSubscribedTopics(currentUserID);
-            var notSubscribedTopics = _unitOfWork.TopicsRepository.GetUnsubscribedTopics(currentUserID);
-
-            foreach (var subscribedTopic in subscribedTopics)
-            {
-                topicsThatCanUnsubscribed.Add(subscribedTopic.TopicId, subscribedTopic.Topic_name);
-            }
-            foreach (var notSubscribedTopic in notSubscribedTopics)
-            {
-                topicsThatCanSubscribed.Add(notSubscribedTopic.TopicId, notSubscribedTopic.Topic_name);
-            }
+            var subscribedTopics = _unitOfWork.TopicsRepository.GetSubscribedTopics(currentUserID).ToList();
+            var notSubscribedTopics = _unitOfWork.TopicsRepository.GetUnsubscribedTopics(currentUserID).ToList();
+            var topicsDto = new TopicsGetDto { topicsToAdd = notSubscribedTopics, topicsToRemove = subscribedTopics };
+            return View(topicsDto);
         }
 
         [HttpPost]

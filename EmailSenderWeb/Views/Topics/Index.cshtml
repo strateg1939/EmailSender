@@ -1,4 +1,4 @@
-﻿
+﻿@model EmailSender.Dto.TopicsGetDto
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -10,10 +10,10 @@
 <br>
 <br>
 <div id='subscription_for_user'>
-    @foreach (var item in ViewData["topicsToAdd"] as Dictionary<int, string>)
+    @foreach (var item in Model.topicsToAdd)
     {
-        var itemText = item.Value + "text"; 
-        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id=@itemText> @item.Value </span></p>
+        var itemText = item.Topic_name + "text"; 
+        <p><input type='checkbox' name='@item.TopicId' value='@item.Topic_name' class='option-input' id='@item.Topic_name'><span class='checkbox_text' id=@itemText> @item.Topic_name </span></p>
     }
 </div>
 <hr id="hr" />
@@ -21,10 +21,10 @@
 <br>
 <br>
 <div id='unsubscription_for_user'>
-    @foreach (var item in ViewData["topicsToRemove"] as Dictionary<int, string>)
+    @foreach (var item in Model.topicsToRemove)
     {
-        var itemText = item.Value + "text";
-        <p><input type='checkbox' name='@item.Key' value='@item.Value' class='option-input' id='@item.Value'><span class='checkbox_text' id=@itemText> @item.Value </span></p>
+        var itemText = item.Topic_name + "text";
+        <p><input type='checkbox' name='@item.TopicId' value='@item.Topic_name' class='option-input' id='@item.Topic_name'><span class='checkbox_text' id=@itemText> @item.Topic_name </span></p>
     }
 </div>
 <input type="submit" name="submit" value="submit" id="subs_submit">
