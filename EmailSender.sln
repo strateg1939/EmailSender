@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailSender", "EmailSenderWeb\EmailSender.csproj", "{DD590E8F-04C7-4CF1-8212-E8A2517B8CA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailDailySenderService", "EmailDailySenderService\EmailDailySenderService.csproj", "{F9365530-184F-4A0B-814A-814715E41513}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailDailySenderService", "EmailDailySenderService\EmailDailySenderService.csproj", "{F9365530-184F-4A0B-814A-814715E41513}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailSenderTests", "EmailSenderTests\EmailSenderTests.csproj", "{6B6EE390-1B57-4F6A-B843-AEE9367C9212}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F9365530-184F-4A0B-814A-814715E41513}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9365530-184F-4A0B-814A-814715E41513}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9365530-184F-4A0B-814A-814715E41513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B6EE390-1B57-4F6A-B843-AEE9367C9212}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B6EE390-1B57-4F6A-B843-AEE9367C9212}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B6EE390-1B57-4F6A-B843-AEE9367C9212}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B6EE390-1B57-4F6A-B843-AEE9367C9212}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

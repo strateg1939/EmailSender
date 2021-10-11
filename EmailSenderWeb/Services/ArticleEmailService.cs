@@ -18,7 +18,7 @@ namespace EmailSender.Services
             _unitOfWork = unitOfWork;
             _senderService = senderService;
         }
-        public async Task SendNecessaryArticlesToUser(AspNetUser user, int topicId)
+        public virtual async Task SendNecessaryArticlesToUser(AspNetUser user, int topicId)
         {
             string topic = _unitOfWork.TopicsRepository.Get(topicId).Topic_name;            
             string subject = "Your daily " + topic + " article";
