@@ -36,7 +36,7 @@ namespace EmailSender.Controllers
         public IActionResult Index()
         {
             ClaimsPrincipal currentUser = this.User;
-            var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var currentUserID = _userManager.GetUserAsync(currentUser).Result.Id;
             var subscribedTopics = _unitOfWork.TopicsRepository.GetSubscribedTopics(currentUserID).ToList();
             var notSubscribedTopics = _unitOfWork.TopicsRepository.GetUnsubscribedTopics(currentUserID).ToList();
             var topicsDto = new TopicsGetDto { topicsToAdd = notSubscribedTopics, topicsToRemove = subscribedTopics };
